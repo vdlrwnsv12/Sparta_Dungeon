@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/vdlrwnsv/Desktop/development/Sparta_FlappyBird/newSparta/Assembly-CSharp.csproj",
+      "projectUniqueName": "/Users/vdlrwnsv/Desktop/development/Sparta_Dungeon/newSparta/Assembly-CSharp.csproj",
       "projectName": "Assembly-CSharp",
-      "projectPath": "/Users/vdlrwnsv/Desktop/development/Sparta_FlappyBird/newSparta/Assembly-CSharp.csproj",
+      "projectPath": "/Users/vdlrwnsv/Desktop/development/Sparta_Dungeon/newSparta/Assembly-CSharp.csproj",
       "packagesPath": "/Users/vdlrwnsv/.nuget/packages/",
-      "outputPath": "/Users/vdlrwnsv/Desktop/development/Sparta_FlappyBird/newSparta/Temp/obj/Debug/Assembly-CSharp/",
+      "outputPath": "/Users/vdlrwnsv/Desktop/development/Sparta_Dungeon/newSparta/Temp/obj/Debug/Assembly-CSharp/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/vdlrwnsv/.nuget/NuGet/NuGet.Config"
