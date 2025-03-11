@@ -369,8 +369,11 @@
 "Assets/04.Scripts/UI/Condition.cs"
 "Assets/04.Scripts/UI/PlayerCondition.cs"
 "Assets/04.Scripts/UI/UICondition.cs"
+"Assets/IceSurface.cs"
+"Assets/InsideWater.cs"
 "Assets/ItemObject.cs"
 "Assets/ItemSlot.cs"
+"Assets/JumpBed.cs"
 "Assets/UiInven.cs"
 -langversion:9.0
 

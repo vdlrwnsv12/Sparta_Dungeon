@@ -2,13 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movment")]
+    [Header("Movement")]
     public float moveSpeed;
-    private Vector2 curMoveInput;
-    private Rigidbody _rigdibody;
+    public Vector2 lastMoveInput;  // 마지막 입력을 저장할 변수
+    public Vector2 curMoveInput;
+    private Rigidbody _rigidbody;
+    public bool isOnIce;
+
 
     [Header("Look")]
     public Transform cameraContainer;
@@ -18,46 +22,80 @@ public class PlayerController : MonoBehaviour
     public float camCurXrot;
     private float lookSensitivity = 1;
     private Vector2 mouseDelta;
-    [Header ("Jump")]
+    public bool canLook = true;
+    public Action inventory;
+
+    [Header("Jump")]
     public float jumpForce = 5;
     public LayerMask groundLayerMask;
+    [Header("camera")]
+    public Camera mainCam;
+    public float currFov;
+    public float fovVelocity;
 
-
+    
     private void Awake()
     {
-        _rigdibody = GetComponent<Rigidbody>();
+        _rigidbody = GetComponent<Rigidbody>();
     }
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        currFov = mainCam.fieldOfView;
     }
+
     void FixedUpdate()
     {
         Move();
     }
+
     private void LateUpdate()
     {
-        CameraLook();
+        if (canLook)
+        {
+            CameraLook();
+        }
     }
+
     void Move()
     {
-        Vector3 dir = transform.forward * curMoveInput.y + transform.right * curMoveInput.x;
-        dir *= moveSpeed;
-        dir.y = _rigdibody.velocity.y;
+        if (isOnIce && lastMoveInput != Vector2.zero)
+        {
+            curMoveInput = lastMoveInput;
+        }
 
-        _rigdibody.velocity = dir;
+        float targetFov = Input.GetKey(KeyCode.LeftShift) ? 76f : 60f;
+        currFov = Mathf.SmoothDamp(currFov, targetFov, ref fovVelocity, 0.1f);
+        mainCam.fieldOfView = currFov;
+        
+        Vector3 dir = transform.forward * curMoveInput.y + transform.right * curMoveInput.x;
+        dir *= Input.GetKey(KeyCode.LeftShift) ? moveSpeed*1.7f : moveSpeed;
+        dir.y = _rigidbody.velocity.y;
+        _rigidbody.velocity = dir;
+
+        if (!isOnIce)
+        {
+            lastMoveInput = Vector2.zero;
+        }else
+        {
+            lastMoveInput = curMoveInput;
+        }
     }
+
     public void OnMove(InputAction.CallbackContext context)
     {
-        if(context.phase == InputActionPhase.Performed)
+        if (context.phase == InputActionPhase.Performed)
         {
             curMoveInput = context.ReadValue<Vector2>();
+            
         }
-        else if(context.phase == InputActionPhase.Canceled)
+        else if (context.phase == InputActionPhase.Canceled)
         {
             curMoveInput = Vector2.zero;
         }
     }
+
     void CameraLook()
     {
         camCurXrot += mouseDelta.y * lookSensitivity;
@@ -70,15 +108,16 @@ public class PlayerController : MonoBehaviour
     public void OnLook(InputAction.CallbackContext context)
     {
         mouseDelta = context.ReadValue<Vector2>();
-        Debug.Log("Mouse Delta: " + mouseDelta);
     }
+
     public void OnJump(InputAction.CallbackContext context)
     {
-        if(context.phase == InputActionPhase.Started && isGrounded())
+        if (context.phase == InputActionPhase.Started && isGrounded())
         {
-            _rigdibody.AddForce(Vector2.up * jumpForce, ForceMode.Impulse);
+            _rigidbody.AddForce(Vector2.up * jumpForce, ForceMode.Impulse);
         }
     }
+
     bool isGrounded()
     {
         Ray[] rays = new Ray[4]
@@ -88,9 +127,10 @@ public class PlayerController : MonoBehaviour
             new Ray(transform.position + (transform.right * 0.2f) + (transform.up * 0.01f), Vector3.down),
             new Ray(transform.position + (-transform.right * 0.2f) + (transform.up * 0.01f), Vector3.down)
         };
-        for(int i = 0; i < rays.Length; i++)
+
+        for (int i = 0; i < rays.Length; i++)
         {
-            if(Physics.Raycast(rays[i], 0.1f, groundLayerMask))
+            if (Physics.Raycast(rays[i], 0.1f, groundLayerMask))
             {
                 return true;
             }
@@ -98,5 +138,19 @@ public class PlayerController : MonoBehaviour
         return false;
     }
 
-}
+    public void OnInventory(InputAction.CallbackContext context)
+    {
+        if (context.phase == InputActionPhase.Started)
+        {
+            inventory?.Invoke();
+            ToggleCursor();
+        }
+    }
 
+    void ToggleCursor()
+    {
+        bool toggle = Cursor.lockState == CursorLockMode.Locked;
+        Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
+        canLook = !toggle;
+    }
+}

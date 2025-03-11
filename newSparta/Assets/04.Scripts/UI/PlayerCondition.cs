@@ -55,4 +55,8 @@ public class PlayerCondition : MonoBehaviour, IDamageable
         onTakeDamage?.Invoke();
         
     }
+    public void SubStamina(int value)
+    {
+        stamina.Subtract(value);
+    }
 }

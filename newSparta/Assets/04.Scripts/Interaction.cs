@@ -57,14 +57,24 @@ public class Interaction : MonoBehaviour
         promptText.text = curInteractable.GetInteractPromp();
     }
     public void OnInteractInput(InputAction.CallbackContext context)
+{
+    if (context.phase == InputActionPhase.Started)
     {
-        if(context.phase == InputActionPhase.Started && curInteractable != null)
+        if (curInteractable == null)
         {
-            curInteractable.OnInteract();
-            curInteractGameObject = null;
-            curInteractable = null;
-            promptText.gameObject.SetActive(false);
+            Debug.LogWarning("상호작용할 대상이 없습니다!");
+            return;
+        }
 
+        curInteractable.OnInteract();
+        curInteractGameObject = null;
+        curInteractable = null;
+
+        if (promptText != null)
+        {
+            promptText.gameObject.SetActive(false);
         }
     }
+}
+
 }
